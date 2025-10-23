@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, Paperclip, Search } from 'lucide-react';
+import { Send, Paperclip, Search, ArrowLeft } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
+import { Input } from '../components/Input';
 import { Avatar } from '../components/Avatar';
 import { supabase, Profile, Message } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,58 +15,62 @@ export const ChatPage = () => {
   const [messageContent, setMessageContent] = useState('');
   const [fileUrl, setFileUrl] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showChatOnMobile, setShowChatOnMobile] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
 
-  // --- Initial fetch
   useEffect(() => {
     fetchUsers();
     fetchUnreadCounts();
   }, []);
 
-  // --- Fetch messages on user select
   useEffect(() => {
     if (selectedUser) {
       fetchMessages();
+      setShowChatOnMobile(true);
       const subscription = supabase
         .channel('messages')
         .on(
           'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'messages' },
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+          },
           (payload) => {
             const newMessage = payload.new as Message;
-            // If message is for this chat, refresh immediately
             if (
               (newMessage.sender_id === selectedUser.id && newMessage.receiver_id === user?.id) ||
               (newMessage.sender_id === user?.id && newMessage.receiver_id === selectedUser.id)
             ) {
               fetchMessages();
             }
-            // Always refresh unread counts
             fetchUnreadCounts();
           }
         )
         .subscribe();
 
-      return () => subscription.unsubscribe();
+      return () => {
+        subscription.unsubscribe();
+      };
     }
   }, [selectedUser]);
 
-  // --- Auto-scroll to bottom on new message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // --- Handle user search
   useEffect(() => {
-    setFilteredUsers(
-      searchQuery
-        ? users.filter((u) =>
-            u.username.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-        : users
-    );
+    if (searchQuery) {
+      setFilteredUsers(
+        users.filter((u) =>
+          u.username.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    } else {
+      setFilteredUsers(users);
+    }
   }, [searchQuery, users]);
 
   const fetchUsers = async () => {
@@ -126,7 +131,7 @@ export const ChatPage = () => {
       .eq('sender_id', selectedUser.id)
       .eq('read', false);
 
-    fetchUnreadCounts(); // refresh badges
+    fetchUnreadCounts();
   };
 
   const sendMessage = async () => {
@@ -152,10 +157,21 @@ export const ChatPage = () => {
     }
   };
 
+  const handleUserSelect = (selectedUser: Profile) => {
+    setSelectedUser(selectedUser);
+    setShowChatOnMobile(true);
+  };
+
+  const handleBackToUsers = () => {
+    setShowChatOnMobile(false);
+    setSelectedUser(null);
+  };
+
   return (
-    <div className="h-[calc(100vh-8rem)] flex gap-4">
-      {/* Left sidebar - users list */}
-      <Card className="w-80 flex flex-col p-0 overflow-hidden">
+    <div className="h-[calc(100vh-8rem)] flex md:gap-4">
+      <Card className={`w-full md:w-80 flex-shrink-0 flex flex-col p-0 overflow-hidden ${
+        showChatOnMobile ? 'hidden md:flex' : 'flex'
+      }`}>
         <div className="p-4 border-b">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -175,10 +191,10 @@ export const ChatPage = () => {
             return (
               <div
                 key={u.id}
-                onClick={() => setSelectedUser(u)}
+                onClick={() => handleUserSelect(u)}
                 className={`flex items-center gap-3 p-4 cursor-pointer relative transition-colors ${
                   selectedUser?.id === u.id
-                    ? 'bg-blue-50 border-l-4 border-blue-700'
+                    ? 'bg-blue-50 md:border-l-4 border-blue-700'
                     : 'hover:bg-gray-50'
                 }`}
               >
@@ -187,10 +203,8 @@ export const ChatPage = () => {
                   <p className="font-semibold text-gray-900 truncate">{u.username}</p>
                   <p className="text-xs text-gray-500 capitalize">{u.role}</p>
                 </div>
-
-                {/* ✅ Unread message badge */}
                 {unread > 0 && (
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 bg-green-600 text-white text-xs font-semibold rounded-full px-2 py-0.5">
+                  <span className="bg-green-600 text-white text-xs font-semibold rounded-full px-2 py-0.5">
                     {unread}
                   </span>
                 )}
@@ -200,12 +214,18 @@ export const ChatPage = () => {
         </div>
       </Card>
 
-      {/* Right chat area */}
-      <Card className="flex-1 flex flex-col p-0 overflow-hidden">
+      <Card className={`w-full md:flex-1 flex flex-col p-0 overflow-hidden ${
+        !showChatOnMobile ? 'hidden md:flex' : 'flex'
+      }`}>
         {selectedUser ? (
           <>
-            {/* Header */}
             <div className="p-4 border-b flex items-center gap-3">
+              <button
+                onClick={handleBackToUsers}
+                className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors -ml-2"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-700" />
+              </button>
               <Avatar src={selectedUser.avatar_url} size="md" />
               <div>
                 <h3 className="font-semibold text-gray-900">{selectedUser.username}</h3>
@@ -213,7 +233,6 @@ export const ChatPage = () => {
               </div>
             </div>
 
-            {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message) => {
                 const isOwnMessage = message.sender_id === user?.id;
@@ -266,7 +285,6 @@ export const ChatPage = () => {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input area */}
             <div className="p-4 border-t">
               {fileUrl && (
                 <div className="mb-2 p-2 bg-blue-50 rounded-lg flex items-center justify-between">
@@ -309,9 +327,9 @@ export const ChatPage = () => {
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
+            <div className="text-center p-4">
               <p className="text-gray-500 text-lg mb-2">Select a user to start chatting</p>
-              <p className="text-gray-400 text-sm">Choose from the list on the left</p>
+              <p className="text-gray-400 text-sm hidden md:block">Choose from the list on the left</p>
             </div>
           </div>
         )}

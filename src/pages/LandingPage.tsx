@@ -28,7 +28,6 @@ export const LandingPage = ({ onNavigate }: LandingPageProps) => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            {/* Logo Image */}
             <div className="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center overflow-hidden">
               <img
                 src="https://pbs.twimg.com/profile_images/1347925217352495104/thepvgY-_400x400.jpg"
@@ -55,20 +54,22 @@ export const LandingPage = ({ onNavigate }: LandingPageProps) => {
       <section className="min-h-screen flex items-center pt-24 pb-20 md:pb-0">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
-            {/* Text content */}
+            {/* Text Content */}
             <div className="space-y-6 order-2 md:order-1">
               <h2 className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight">
-               Build Your Future with LuxDev Academy
+                Build Your Future with LuxDev Academy
               </h2>
               <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
                 A modern platform for assignment submission, collaboration, and communication between students and instructors.
               </p>
               <div className="flex gap-4">
-                <Button variant="primary" size="lg"
-                className="bg-indigo-950 hover:bg-indigo-900"
-                 onClick={() => onNavigate('signup')}>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="bg-indigo-950 hover:bg-indigo-900"
+                  onClick={() => onNavigate('signup')}
+                >
                   Get Started
-      
                 </Button>
                 <Button
                   variant="outline"
@@ -81,7 +82,7 @@ export const LandingPage = ({ onNavigate }: LandingPageProps) => {
               </div>
             </div>
 
-            {/* Rotating image */}
+            {/* Rotating Image */}
             <div className="relative h-[300px] md:h-[360px] w-full md:w-[75%] mx-auto overflow-hidden rounded-xl order-1 md:order-2">
               {heroImages.map((img, index) => (
                 <div
@@ -118,7 +119,9 @@ export const LandingPage = ({ onNavigate }: LandingPageProps) => {
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <BookOpen className="w-8 h-8 text-blue-700" />
               </div>
-              <h4 className="text-xl font-semibold mb-2 text-gray-900">Assignment Management</h4>
+              <h4 className="text-xl font-semibold mb-2 text-gray-900">
+                Assignment Management
+              </h4>
               <p className="text-gray-600">
                 Submit assignments, track progress, and receive grades all in one place.
               </p>
@@ -159,8 +162,19 @@ export const LandingPage = ({ onNavigate }: LandingPageProps) => {
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
+        <div className="container mx-auto px-4 text-center space-y-2">
           <p>&copy; 2025 LuxDev HQ. All rights reserved.</p>
+          <p>
+            by{' '}
+            <a
+              href="https://gregory-tech.netlify.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 underline transition-colors"
+            >
+              gregory.tech
+            </a>
+          </p>
         </div>
       </footer>
     </div>

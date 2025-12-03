@@ -1,6 +1,6 @@
 # LuxDev Portal – Student Collaboration & Assignment Platform
 
-![Git visualization](visualizations/git1.jpg)  
+![Git visualization](visualizations/lux1.jpg)  
 
 A modern web platform built with **React** (frontend) and **PostgreSQL** (backend/database) to streamline student workflows. Students can submit assignments, receive grades, message classmates and instructors, share articles, and track their progress—all in one intuitive dashboard.  
 

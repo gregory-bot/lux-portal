@@ -34,6 +34,11 @@ This solves the pain of scattered submissions across emails, drives, or external
 - Yarn or npm
 - Git
 
+- ![Lux preview](lux2.jpg)
+- ![Lux preview](lux3.jpg)
+- ![Lux preview](lux4.jpg)
+- ![Lux preview](lux5.jpg) 
+
 ### Setup Instructions
 1. **Clone the Repo**:
    git clone https://github.com/yourusername/luxdev-portal.git  # Replace with your repo URL
@@ -433,4 +438,3 @@ CREATE INDEX IF NOT EXISTS idx_articles_author ON articles(author_id);
 CREATE INDEX IF NOT EXISTS idx_article_likes_article ON article_likes(article_id);
 CREATE INDEX IF NOT EXISTS idx_article_comments_article ON article_comments(article_id);
 CREATE INDEX IF NOT EXISTS idx_article_bookmarks_user ON article_bookmarks(user_id);
-```/*

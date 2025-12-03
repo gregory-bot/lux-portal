@@ -434,6 +434,7 @@ CREATE INDEX IF NOT EXISTS idx_article_likes_article ON article_likes(article_id
 CREATE INDEX IF NOT EXISTS idx_article_comments_article ON article_comments(article_id);
 CREATE INDEX IF NOT EXISTS idx_article_bookmarks_user ON article_bookmarks(user_id);
 
+## image**
 ![Lux preview 2](lux2.jpg)
 ![Lux preview 3](lux3.jpg)
 ![Lux preview 4](lux4.jpg)
